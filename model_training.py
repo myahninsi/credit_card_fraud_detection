@@ -2,12 +2,13 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.compose import ColumnTransformer
 from imblearn.over_sampling import SMOTE
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import classification_report, roc_auc_score, roc_curve, precision_recall_curve, confusion_matrix
+from sklearn.metrics import classification_report, roc_auc_score, roc_curve, precision_recall_curve, confusion_matrix, f1_score
 import pickle
 
 # Load data
@@ -67,8 +68,20 @@ model.fit(X_train, y_train)
 
 # Model evaluation
 y_pred_proba = model.predict_proba(X_test)[:, 1]
-# Apply threshold adjustment to increase fraud detection sensitivity
-y_pred = (y_pred_proba > 0.3).astype(int)  # Lower threshold to 30%
+
+# Compute Precision-Recall Curve
+precision, recall, thresholds = precision_recall_curve(y_test, y_pred_proba)
+
+# Compute F1 scores for each threshold
+f1_scores = 2 * (precision * recall) / (precision + recall)
+f1_scores = np.nan_to_num(f1_scores)  # Handle NaN values
+
+# Select the threshold with the best F1-score
+best_threshold = thresholds[np.argmax(f1_scores)]
+print(f"Optimal Decision Threshold (F1-Optimized): {best_threshold:.2f}")
+
+# Apply the optimized threshold
+y_pred = (y_pred_proba > best_threshold).astype(int)
 
 print("Classification Report: \n", classification_report(y_test, y_pred))
 print("ROC AUC Score: ", roc_auc_score(y_test, y_pred_proba))
@@ -92,7 +105,6 @@ plt.legend()
 plt.show()
 
 # Plot Precision-Recall Curve
-precision, recall, _ = precision_recall_curve(y_test, y_pred_proba)
 plt.plot(recall, precision, marker='.', label="Precision-Recall Curve")
 plt.xlabel("Recall")
 plt.ylabel("Precision")
@@ -102,6 +114,6 @@ plt.show()
 
 # Save preprocessor and model
 with open("fraud_model.pkl", "wb") as file:
-    pickle.dump((preprocessor, model), file)
+    pickle.dump((preprocessor, model, best_threshold), file)
 
 print("Model training complete!")
