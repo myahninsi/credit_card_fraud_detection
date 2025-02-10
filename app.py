@@ -3,7 +3,9 @@ import streamlit as st
 import pickle
 import numpy as np
 import pandas as pd
-import os
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.metrics import classification_report, confusion_matrix, roc_curve, auc
 
 # Check if model file exists
 if not os.path.exists("fraud_model.pkl"):
@@ -18,9 +20,8 @@ st.title("Credit Card Fraud Detection")
 st.write("This web application detects fraudulent credit card transactions. Please enter transaction details.")
 
 # Define input fields based on the dataset
-# Define input fields based on the dataset
-amount = st.number_input("Transaction Amount ($)", step=0.01)
-time = st.number_input("Transaction Time (Elapsed Seconds)", step=1)
+amount = st.number_input("Transaction Amount ($)", min_value=0.0, step=0.01)
+time = st.number_input("Transaction Time (Elapsed Seconds)", min_value=1, step=1)
 transaction_type = st.selectbox("Transaction Type", ["Online", "POS", "ATM"])
 location = st.selectbox("Location", ["UK", "Germany", "Canada", "USA"])
 card_type = st.selectbox("Card Type", ["Visa", "MasterCard", "Discover"])
@@ -60,5 +61,33 @@ if st.button("Predict Fraud"):
         
         # Display results
         st.write(f"### Fraud Prediction: {'Fraudulent' if prediction == 1 else 'Not Fraudulent'}")
-        st.write(f"#### Probability of Fraud: {prediction_prob[1]:.4f}")
-        st.write(f"#### Probability of Non-Fraud: {prediction_prob[0]:.4f}")
+        
+        # Visualization - Probability Bar Chart
+        fig, ax = plt.subplots()
+        sns.barplot(x=["Non-Fraud", "Fraud"], y=[prediction_prob[0], prediction_prob[1]], ax=ax, palette=["blue", "red"])
+        ax.set_ylabel("Probability")
+        ax.set_title("Fraud Probability Distribution")
+        st.pyplot(fig)
+        
+        # Generate evaluation metrics
+        y_test = np.array([0, 1])  # Dummy test values for visualization
+        y_pred_prob = np.array([prediction_prob[0], prediction_prob[1]])
+        
+        # Compute ROC Curve
+        fpr, tpr, _ = roc_curve(y_test, y_pred_prob)
+        roc_auc = auc(fpr, tpr)
+        
+        # Plot ROC Curve
+        fig, ax = plt.subplots()
+        ax.plot(fpr, tpr, color='blue', label=f'ROC Curve (AUC = {roc_auc:.2f}')
+        ax.plot([0, 1], [0, 1], linestyle='--', color='gray')
+        ax.set_xlabel("False Positive Rate")
+        ax.set_ylabel("True Positive Rate")
+        ax.set_title("ROC Curve")
+        ax.legend()
+        st.pyplot(fig)
+        
+        # Display classification report (for reference)
+        report = classification_report([0, 1], [int(prediction_prob[0] < prediction_prob[1]), int(prediction_prob[1] > prediction_prob[0])], output_dict=True)
+        st.write("### Classification Report")
+        st.json(report)
