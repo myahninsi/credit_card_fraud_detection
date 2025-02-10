@@ -15,7 +15,7 @@ df = pd.read_csv("dataset/credit_card_fraud_dataset.csv")
 
 # Handle missing values
 missing_values = df.isnull().sum()
-print("Missing Values: \n", missing_values)
+print(missing_values)
 
 # Drop Transaction_ID
 df.drop(columns=["Transaction_ID"], inplace=True)
@@ -26,7 +26,7 @@ y = df["Fraudulent"]
 
 # Check for class imbalance
 class_distribution = y.value_counts()
-print("Original Class Distribution:\n", class_distribution)
+print(class_distribution)
 
 # Identify numerical columns
 num_features = ["Amount", "Time", "Previous_Fraudulent"]
@@ -47,7 +47,7 @@ preprocessor = ColumnTransformer(
 # Apply preprocessing to features
 X_processed = preprocessor.fit_transform(X)
 
-# Print transformed feature names
+# Print transformed features
 print("Processed feature names:", preprocessor.get_feature_names_out())
 
 # Use SMOTE to handle class imbalance
@@ -56,20 +56,18 @@ X_resampled, y_resampled = smote.fit_resample(X_processed, y)
 
 # Print resampled class distribution
 class_distribution_resampled = y_resampled.value_counts()
-print("Resampled Class Distribution:\n", class_distribution_resampled)
+print(class_distribution_resampled)
 
 # Train Test Split 80-20
 X_train, X_test, y_train, y_test = train_test_split(X_resampled, y_resampled, test_size=0.2, random_state=42)
 
-# Train logistic regression model with balanced class weights
-model = LogisticRegression(class_weight='balanced', random_state=42)
+# Train logistic regression model
+model = LogisticRegression()
 model.fit(X_train, y_train)
 
 # Model evaluation
+y_pred = model.predict(X_test)
 y_pred_proba = model.predict_proba(X_test)[:, 1]
-# Apply threshold adjustment to increase fraud detection sensitivity
-y_pred = (y_pred_proba > 0.3).astype(int)  # Lower threshold to 30%
-
 print("Classification Report: \n", classification_report(y_test, y_pred))
 print("ROC AUC Score: ", roc_auc_score(y_test, y_pred_proba))
 
@@ -83,7 +81,7 @@ plt.show()
 
 # Plot ROC Curve
 fpr, tpr, _ = roc_curve(y_test, y_pred_proba)
-plt.plot(fpr, tpr, label=f"ROC Curve (AUC = {roc_auc_score(y_test, y_pred_proba):.2f})")
+plt.plot(fpr, tpr, label=f"ROC Curve (AUC = {roc_auc_score(y_test, y_pred_proba):.2f}")
 plt.plot([0, 1], [0, 1], linestyle='--', color='gray')
 plt.xlabel("False Positive Rate")
 plt.ylabel("True Positive Rate")
