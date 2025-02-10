@@ -22,10 +22,10 @@ else:
     amount = st.sidebar.number_input("Transaction Amount ($)", min_value=0.0, step=0.01)
     time = st.sidebar.number_input("Transaction Time (Elapsed Seconds)", min_value=1, step=1)
     transaction_type = st.sidebar.selectbox("Transaction Type", ["Online", "POS", "ATM"])
-    location = st.sidebar.selectbox("Location", ["UK", "Germany", "Canada", "USA"])
-    card_type = st.sidebar.selectbox("Card Type", ["Visa", "MasterCard", "Discover"])
-    merchant_category = st.sidebar.selectbox("Merchant Category", ["Travel", "Grocery", "Electronics", "Clothing"])
-    device_type = st.sidebar.selectbox("Device Type", ["Mobile", "Desktop", "Tablet"])
+    location = st.sidebar.selectbox("Location", ["UK", "Germany", "Canada", "USA", "India"])
+    card_type = st.sidebar.selectbox("Card Type", ["Amex", "Visa", "MasterCard", "Discover"])
+    merchant_category = st.sidebar.selectbox("Merchant Category", ["Electronics", "Food", "Grocery", "Retail", "Travel"])
+    device_type = st.sidebar.selectbox("Device Type", ["Mobile", "Desktop", "Tablet", "Laptop"])
     previous_fraudulent = st.sidebar.selectbox("Previous Fraudulent Transactions", [0, 1])
 
     # Input validation and Prediction Button
