@@ -3,6 +3,11 @@ import streamlit as st
 import pickle
 import numpy as np
 import pandas as pd
+import os
+
+# Check if model file exists
+if not os.path.exists("fraud_model.pkl"):
+    st.error("Model file 'fraud_model.pkl' not found. Please ensure it is in the correct directory.")
 
 # Load the preprocessor and model from pickle file
 with open("fraud_model.pkl", "rb") as model_file:
