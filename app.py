@@ -5,7 +5,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import os
-from sklearn.metrics import classification_report, confusion_matrix, roc_curve, auc
 
 # Set Streamlit page layout
 st.set_page_config(page_title="Credit Card Fraud Detection", layout="wide")
@@ -67,43 +66,3 @@ else:
                 sns.barplot(x=["Non-Fraud", "Fraud"], y=[prediction_prob[0], prediction_prob[1]], ax=ax, palette=["blue", "red"])
                 ax.set_ylabel("Probability")
                 st.pyplot(fig)
-            
-            # Generate evaluation metrics
-            y_test = np.array([0, 1])  # Dummy test values for visualization
-            y_pred_prob = np.array([prediction_prob[0], prediction_prob[1]])
-            
-            # Compute Confusion Matrix
-            conf_matrix = confusion_matrix([0, 1], [int(prediction_prob[0] < prediction_prob[1]), int(prediction_prob[1] > prediction_prob[0])])
-            
-            st.markdown("---")
-            st.markdown("### Model Evaluation Metrics")
-            
-            col3, col4 = st.columns(2)
-            with col3:
-                st.markdown("#### Confusion Matrix")
-                fig, ax = plt.subplots()
-                sns.heatmap(conf_matrix, annot=True, fmt='d', cmap='Blues', xticklabels=['Not Fraud', 'Fraud'], yticklabels=['Not Fraud', 'Fraud'])
-                ax.set_xlabel("Predicted")
-                ax.set_ylabel("Actual")
-                st.pyplot(fig)
-            
-            with col4:
-                # Compute ROC Curve
-                fpr, tpr, _ = roc_curve(y_test, y_pred_prob)
-                roc_auc = auc(fpr, tpr)
-                
-                st.markdown("#### ROC Curve")
-                fig, ax = plt.subplots()
-                ax.plot(fpr, tpr, color='blue', label=f'ROC Curve (AUC = {roc_auc:.2f}')
-                ax.plot([0, 1], [0, 1], linestyle='--', color='gray')
-                ax.set_xlabel("False Positive Rate")
-                ax.set_ylabel("True Positive Rate")
-                ax.legend()
-                st.pyplot(fig)
-            
-            # Display classification report as a styled table
-            report_dict = classification_report([0, 1], [int(prediction_prob[0] < prediction_prob[1]), int(prediction_prob[1] > prediction_prob[0])], output_dict=True)
-            report_df = pd.DataFrame(report_dict).transpose()
-            
-            st.markdown("#### Classification Report")
-            st.dataframe(report_df.style.format("{:.4f}").set_properties(**{'background-color': 'black', 'color': 'white'}))
