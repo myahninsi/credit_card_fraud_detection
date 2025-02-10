@@ -13,9 +13,9 @@ st.set_page_config(page_title="Credit Card Fraud Detection", layout="wide")
 if not os.path.exists("fraud_model.pkl"):
     st.error("Model file 'fraud_model.pkl' not found. Please ensure it is in the correct directory.")
 else:
-    # Load the saved model and preprocessor
-    with open("fraud_model.pkl", "rb") as model_file:
-        preprocessor, model = pickle.load(model_file)
+    # Load the saved model, preprocessor and best threshold
+    with open("fraud_model.pkl", "rb") as file:
+        preprocessor, model, best_threshold = pickle.load(file)
 
     # Sidebar for input fields
     st.sidebar.title("Enter Transaction Details")
