@@ -62,6 +62,8 @@ if st.button("Predict Fraud"):
         
         # Display results
         st.write(f"### Fraud Prediction: {'Fraudulent' if prediction == 1 else 'Not Fraudulent'}")
+        st.write(f"#### Probability of Fraud: {prediction_prob[1]:.4f}")
+        st.write(f"#### Probability of Non-Fraud: {prediction_prob[0]:.4f}")
         
         # Visualization - Probability Bar Chart
         fig, ax = plt.subplots()
@@ -88,7 +90,8 @@ if st.button("Predict Fraud"):
         ax.legend()
         st.pyplot(fig)
         
-        # Display classification report (for reference)
-        report = classification_report([0, 1], [int(prediction_prob[0] < prediction_prob[1]), int(prediction_prob[1] > prediction_prob[0])], output_dict=True)
+        # Display classification report as a table
+        report_dict = classification_report([0, 1], [int(prediction_prob[0] < prediction_prob[1]), int(prediction_prob[1] > prediction_prob[0])], output_dict=True)
+        report_df = pd.DataFrame(report_dict).transpose()
         st.write("### Classification Report")
-        st.json(report)
+        st.dataframe(report_df)
