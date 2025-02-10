@@ -6,6 +6,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.metrics import classification_report, confusion_matrix, roc_curve, auc
+import os
 
 # Check if model file exists
 if not os.path.exists("fraud_model.pkl"):
