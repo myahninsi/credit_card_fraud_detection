@@ -19,8 +19,8 @@ st.write("This web application detects fraudulent credit card transactions. Plea
 
 # Define input fields based on the dataset
 # Define input fields based on the dataset
-amount = st.number_input("Transaction Amount ($)", min_value=0.0, step=0.01)
-time = st.number_input("Transaction Time (Elapsed Seconds)", min_value=1, step=1)
+amount = st.number_input("Transaction Amount ($)", step=0.01)
+time = st.number_input("Transaction Time (Elapsed Seconds)", step=1)
 transaction_type = st.selectbox("Transaction Type", ["Online", "POS", "ATM"])
 location = st.selectbox("Location", ["UK", "Germany", "Canada", "USA"])
 card_type = st.selectbox("Card Type", ["Visa", "MasterCard", "Discover"])
